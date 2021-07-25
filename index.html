@@ -1,70 +1,557 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>散戶互助會</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.min.js"></script>
-    <script>
-    var crypt = {
-      secret : "TOKYO",
-      
-      encrypt : function (clear) {
-        var cipher = CryptoJS.AES.encrypt(clear, crypt.secret);
-        cipher = cipher.toString();
-        return cipher;
-      },
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>ZOSS打卡系統-出勤紀錄</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
+        <link rel="stylesheet prefetch" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.18.3/bootstrap-table.min.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.18.3/bootstrap-table.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.18.3/extensions/multiple-sort/bootstrap-table-multiple-sort.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.18.3/extensions/editable/bootstrap-table-editable.min.js"></script>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.1.8/vue.min.js'></script>
+    	<script src="https://cdn.jsdelivr.net/npm/vue2-filters/dist/vue2-filters.min.js"></script>
+        <style>
 
-      decrypt : function (cipher) {
-        var decipher = CryptoJS.AES.decrypt(cipher, crypt.secret);
-        decipher = decipher.toString(CryptoJS.enc.Utf8);
-        return decipher;
-      }
-    };
+            /*!
+            * Load Awesome v1.1.0 (http://github.danielcardoso.net/load-awesome/)
+            * Copyright 2015 Daniel Cardoso <@DanielCardoso>
+            * Licensed under MIT
+            */
+            .john-fullscreen {
+                position:fixed;
+                left: 0;
+                top: 0;
+                width: 100vw;
+                height: 100vh;
+                z-index: 999;
+                background-color:gray;
+                opacity:0.5;
+            }
+            .la-ball-spin-fade,
+            .la-ball-spin-fade > div {
+                position: fixed;
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                        box-sizing: border-box;
+            }
+            .la-ball-spin-fade {
+                display: block;
+                font-size: 0;
+                color: #fff;
+            }
+            .la-ball-spin-fade.la-dark {
+                color: #333;
+            }
+            .la-ball-spin-fade > div {
+                display: inline-block;
+                float: none;
+                background-color: currentColor;
+                border: 0 solid currentColor;
+            }
+            .la-ball-spin-fade {
+                position: absolute;
+                width: 32px;
+                height: 32px;
+                top:  calc(50% - 20px);
+                left: calc(50% - 20px);
+            }
+            .la-ball-spin-fade > div {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 8px;
+                height: 8px;
+                margin-top: -4px;
+                margin-left: -4px;
+                border-radius: 100%;
+                -webkit-animation: ball-spin-fade 1s infinite linear;
+                -moz-animation: ball-spin-fade 1s infinite linear;
+                    -o-animation: ball-spin-fade 1s infinite linear;
+                        animation: ball-spin-fade 1s infinite linear;
+            }
+            .la-ball-spin-fade > div:nth-child(1) {
+                top: 5%;
+                left: 50%;
+                -webkit-animation-delay: -1.125s;
+                -moz-animation-delay: -1.125s;
+                    -o-animation-delay: -1.125s;
+                        animation-delay: -1.125s;
+            }
+            .la-ball-spin-fade > div:nth-child(2) {
+                top: 18.1801948466%;
+                left: 81.8198051534%;
+                -webkit-animation-delay: -1.25s;
+                -moz-animation-delay: -1.25s;
+                    -o-animation-delay: -1.25s;
+                        animation-delay: -1.25s;
+            }
+            .la-ball-spin-fade > div:nth-child(3) {
+                top: 50%;
+                left: 95%;
+                -webkit-animation-delay: -1.375s;
+                -moz-animation-delay: -1.375s;
+                    -o-animation-delay: -1.375s;
+                        animation-delay: -1.375s;
+            }
+            .la-ball-spin-fade > div:nth-child(4) {
+                top: 81.8198051534%;
+                left: 81.8198051534%;
+                -webkit-animation-delay: -1.5s;
+                -moz-animation-delay: -1.5s;
+                    -o-animation-delay: -1.5s;
+                        animation-delay: -1.5s;
+            }
+            .la-ball-spin-fade > div:nth-child(5) {
+                top: 94.9999999966%;
+                left: 50.0000000005%;
+                -webkit-animation-delay: -1.625s;
+                -moz-animation-delay: -1.625s;
+                    -o-animation-delay: -1.625s;
+                        animation-delay: -1.625s;
+            }
+            .la-ball-spin-fade > div:nth-child(6) {
+                top: 81.8198046966%;
+                left: 18.1801949248%;
+                -webkit-animation-delay: -1.75s;
+                -moz-animation-delay: -1.75s;
+                    -o-animation-delay: -1.75s;
+                        animation-delay: -1.75s;
+            }
+            .la-ball-spin-fade > div:nth-child(7) {
+                top: 49.9999750815%;
+                left: 5.0000051215%;
+                -webkit-animation-delay: -1.875s;
+                -moz-animation-delay: -1.875s;
+                    -o-animation-delay: -1.875s;
+                        animation-delay: -1.875s;
+            }
+            .la-ball-spin-fade > div:nth-child(8) {
+                top: 18.179464974%;
+                left: 18.1803700518%;
+                -webkit-animation-delay: -2s;
+                -moz-animation-delay: -2s;
+                    -o-animation-delay: -2s;
+                        animation-delay: -2s;
+            }
     
-    var url = new URL(location.href);
-    var cipher = url.searchParams.get("cipher");
-    window.onload = function() {
-      if (cipher) {
-        var decipher = crypt.decrypt(cipher);
-        console.log(decipher);
-        if (decipher.substring(0,4) === "http") {
-          window.location.href = decipher;
-        } else {
-          document.getElementById("shared_content").value = decipher;
-          document.getElementById("shared").style.display = "block";
-        }
-      } else {
-        document.getElementById("to_share").style.display = "block";
-      }
-    };
+            .la-ball-spin-fade.la-2x {
+                width: 64px;
+                height: 64px;
+            }
+            .la-ball-spin-fade.la-2x > div {
+                width: 16px;
+                height: 16px;
+                margin-top: -8px;
+                margin-left: -8px;
+            }
+    
+            /*
+            * Animation
+            */
+            @-webkit-keyframes ball-spin-fade {
+                0%,
+                100% {
+                    opacity: 1;
+                    -webkit-transform: scale(1);
+                            transform: scale(1);
+                }
+                50% {
+                    opacity: .25;
+                    -webkit-transform: scale(.5);
+                            transform: scale(.5);
+                }
+            }
+            @-moz-keyframes ball-spin-fade {
+                0%,
+                100% {
+                    opacity: 1;
+                    -moz-transform: scale(1);
+                        transform: scale(1);
+                }
+                50% {
+                    opacity: .25;
+                    -moz-transform: scale(.5);
+                        transform: scale(.5);
+                }
+            }
+            @-o-keyframes ball-spin-fade {
+                0%,
+                100% {
+                    opacity: 1;
+                    -o-transform: scale(1);
+                    transform: scale(1);
+                }
+                50% {
+                    opacity: .25;
+                    -o-transform: scale(.5);
+                    transform: scale(.5);
+                }
+            }
+            @keyframes ball-spin-fade {
+                0%,
+                100% {
+                    opacity: 1;
+                    -webkit-transform: scale(1);
+                    -moz-transform: scale(1);
+                        -o-transform: scale(1);
+                            transform: scale(1);
+                }
+                50% {
+                    opacity: .25;
+                    -webkit-transform: scale(.5);
+                    -moz-transform: scale(.5);
+                        -o-transform: scale(.5);
+                            transform: scale(.5);
+                }
+            }
+        </style>
+    </head>
 
-    function encrypt_input() {
-      var input_text = document.getElementById("share_content").value;
-      cipher = crypt.encrypt(input_text);
-      var l_share = crypt.decrypt("U2FsdGVkX19bZdUyP6Nn11iNElZNRfqr9dualpOypUoY0VC1oUKSEg4fcjNfbJnx");
-      console.log(cipher);
-      // https://line.me/R/share?text=
-      window.location.href = l_share + encodeURIComponent(url.href + "?cipher="+encodeURIComponent(cipher));
-    }
-
-    </script>
-  </head>
-  <body style="margin: 0 auto;max-width: 85%;">
-    <div id="to_share" style="text-align: center;display: none;">
-      <H1>請輸入要分享內容</H1>
-      <textarea id="share_content"
-        rows="20"
-        required
-        style="width:100%;"
-      ></textarea>
-      <input type="button" value="分享" onclick="encrypt_input()">
+    <body>
+    <div id="vue">
+        <make-order ref="makeorder" :suppliers="suppliers" :orders="orders" :supplier="supplier" :order="order" :is_creating="is_creating"></make-order>
     </div>
-    <div id="shared" style="text-align: center;display: none;">
-      <textarea id="shared_content"
-        cols="auto"
-        required
-        style="width:100%;"
-      ></textarea>
-    <div>
+    <table id="table" class="table-striped border-success"></table>
+    <div id="john_loading" class="john-fullscreen" style="visibility:hidden"> <div class="la-ball-spin-fade la-dark la-2x"> <div></div> <div></div> <div></div> <div></div> <div></div> <div></div> <div></div> <div></div> </div> </div>
+    <script> 
+        
+		var data = {
+            // suppliers: {{ suppliers|safe }},
+            // orders: {{ orders|safe }},
+            suppliers: ["UNIX", "萊雅", "哥德式", "Rough99"],
+            orders: {"UNIX":{"123456476756":{"到貨日期":"213213214241"}, "33333333333333333":{}}},
+            supplier: "UNIX",
+            order: "",
+            is_creating: false,
+		};
 
-  </body>
+        Vue.component('make-order', {
+            template:
+                '<div>' +
+                '<div id="DataTable" class="table-container">' +
+                '<select id="supplier" v-model="supplier">' +
+                '<option value="" disabled>貨源</option>' +
+                '<option v-for="(supplier_name, index) in suppliers" :value="supplier_name">{{ supplier_name }}</option>' +
+                '</select>' +
+                '&nbsp;&nbsp;' +
+                '<select :disabled="supplier === \'\'" id="order" v-model="order">' +
+                '<option value="">叫貨訂單</option>' +
+                '<template v-if="supplier !== \'\' && typeof orders[supplier] !== \'undefined\'">'+
+                '<option v-for="(order_info, order_no, index) in orders[supplier]" :value="order_no">{{ order_no }}{{ order["到貨日期"] !== ""? "(已到貨)" : "" }}</option>' +
+                '</template>'+
+                '</select>' +
+                '&nbsp;&nbsp;' +
+                '<button :disabled="!(supplier !== \'\' && order !== \'\')" class="submit" id="submit_view" @click="get_items(event)"><strong>檢視叫貨</strong></button>' +
+                '&nbsp;&nbsp;' +
+                '<button :disabled="!(supplier !== \'\' && order !== \'\' && orders[supplier][order][\'到貨日期\'] !== \'\')" class="submit" id="submit_view" @click="get_items(event)"><strong>到貨點收</strong></button>' +
+                '&nbsp;&nbsp;' +
+                '<button :disabled="!(supplier !== \'\' && order === \'\' && !is_creating)" class="submit" id="submit_view" @click="new_order()"><strong>新增叫貨</strong></button>' +
+                '</div></div>',
+            props: ["suppliers", "orders", "supplier", "order", "is_creating"],
+            filters: {
+                date_parser: function(date) {
+                    if (date) {
+                        return date.split('T')[0];
+                    } else {
+                        return '';
+                    }
+                }
+            },
+            methods: {
+
+            }
+        });
+
+        var order_items = {'✨哥德式生命輕果油LS 120Ml ✨哥德式生命輕果油LS 120Ml': {'合計數量': 5, '711訂單清單': [{'711訂單號碼': 'CM2105271075375', '數量': '1', '訂單索引': 156, '訂購人': '傅*涵', '訂購日期': '2021/05/27 9:55:46', '狀態': '訂單成立', '狀態更新時間': '05/27 9:55'}, {'711訂單號碼': 'CM2105271114268', '數量': '1', '訂單索引': 172, '訂購人': '陳*宇', '訂購日期': '2021/05/27 23:57:59', '狀態': '訂單成立', '狀態更新時間': '05/27 23:57'}, {'711訂單號碼': 'CM2105281147992', '數量': '1', '訂單索引': 197, '訂購人': '陳*樺', '訂購日期': '2021/05/28 20:36:13', '狀態': '訂單成立', '狀態更新時間': '05/28 20:36'}, {'711訂單號碼': 'CM2105281152572', '數量': '1', '訂單索引': 204, '訂購人': '李*芸', '訂購日期': '2021/05/28 22:07:51', '狀態': '訂單成立', '狀態更新時間': '05/28 22:07'}, {'711訂單號碼': 'CM2105311273631', '數量': '1', '訂單索引': 240, '訂購人': '林*燕', '訂購日期': '2021/05/31 21:00:05', '狀態': '訂單成立', '狀態更新時間': '05/31 21:00'}], '社團販售商品名': '✨哥德式生命輕果油LS 120Ml', '廠商': '哥德式', '科目': '哥德式果油乳', '項目': 'LS', '店東利潤': '48', '設計師利潤': '143', '定價': '950', '沙龍定價': '475', '進價': '404', '貨源': 'Rough99'}, '✨哥德式生命果油 GS 120Ml ✨哥德式生命果油 GS 120Ml': {'合計數量': 10, '711訂單清單': [{'711訂單號碼': 'CM2105271075375', '數量': '1', '訂單索引': 157, '訂購人': '傅*涵', '訂購日期': '2021/05/27 9:55:46', '狀態': '訂單成立', '狀態更新時間': '05/27 9:55'}, {'711訂單號碼': 'CM2105271104058', '數量': '1', '訂單索引': 169, '訂購人': '陳*妤', '訂購日期': '2021/05/27 20:34:18', '狀態': '訂單成立', '狀態更新時間': '05/27 20:34'}, {'711訂單號碼': 'CM2105281122077', '數量': '1', '訂單索引': 180, '訂購人': '羅*萱', '訂購日期': '2021/05/28 10:38:49', '狀態': '訂單成立', '狀態更新時間': '05/28 10:38'}, {'711訂單號碼': 'CM2105291164932', '數量': '1', '訂單索引': 205, '訂購人': '王*佩', '訂購日期': '2021/05/29 11:03:01', '狀態': '訂單成立', '狀態更新時間': '05/29 11:03'}, {'711訂單號碼': 'CM2105301202907', '數量': '2', '訂單索引': 217, '訂購人': '蔡*珊', '訂購日期': '2021/05/30 4:39:22', '狀態': '訂單成立', '狀態更新時間': '05/30 4:39'}, {'711訂單號碼': 'CM2105311238116', '數量': '1', '訂單索引': 223, '訂購人': '韓*立', '訂購日期': '2021/05/31 1:06:32', '狀態': '訂單成立', '狀態更新時間': '05/31 1:06'}, {'711訂單號碼': 'CM2105311245200', '數量': '1', '訂單索引': 230, '訂購人': '何*佩', '訂購日期': '2021/05/31 10:54:27', '狀態': '訂單成立', '狀態更新時間': '05/31 10:54'}, {'711訂單號碼': 'CM2105311276451', '數量': '1', '訂單索引': 241, '訂購人': '謝*倫', '訂購日期': '2021/05/31 21:47:27', '狀態': '訂單成立', '狀態更新時間': '05/31 21:47'}, {'711訂單號碼': 'CM2105311281357', '數量': '1', '訂單索引': 247, '訂購人': '陳*娥', '訂購日期': '2021/05/31 23:17:54', '狀態': '訂單成立', '狀態更新時間': '05/31 23:17'}], '社團販售商品名': '✨哥德式生命果油 GS 120Ml', '廠商': '哥德式', '科目': '哥德式果油乳', '項目': 'GS', '店東利潤': '53', '設計師利潤': '158', '定價': '1050', '沙龍定價': '525', '進價': '446', '貨源': 'Rough99'}, '✨哥德式生命果乳 GE 120Ml ✨哥德式生命果乳 GE 120Ml': {'合計數量': 9, '711訂單清單': [{'711訂單號碼': 'CM2105271085473', '數量': '2', '訂單索引': 158, '訂購人': '江*成', '訂購日期': '2021/05/27 14:26:08', '狀態': '訂單成立', '狀態更新時間': '05/27 14:26'}, {'711訂單號碼': 'CM2105281121548', '數量': '1', '訂單索引': 178, '訂購人': '黃*玲', '訂購日期': '2021/05/28 10:18:58', '狀態': '訂單成立', '狀態更新時間': '05/28 10:18'}, {'711訂單號碼': 'CM2105291168625', '數量': '1', '訂單索引': 207, '訂購人': '吳*蓉', '訂購日期': '2021/05/29 12:58:37', '狀態': '訂單成立', '狀態更新時間': '05/29 12:58'}, {'711訂單號碼': 'CM2105291179243', '數量': '2', '訂單索引': 210, '訂購人': '林*欣', '訂購日期': '2021/05/29 16:57:15', '狀態': '訂單成立', '狀態更新時間': '05/29 16:57'}, {'711訂單號碼': 'CM2105291194192', '數量': '1', '訂單索引': 215, '訂購人': '游*靜', '訂購日期': '2021/05/29 22:12:17', '狀態': '訂單成立', '狀態更新時間': '05/29 22:12'}, {'711訂單號碼': 'CM2105301220744', '數量': '1', '訂單索引': 220, '訂購人': '陳*穎', '訂購日期': '2021/05/30 17:34:54', '狀態': '訂單成立', '狀態更新時間': '05/30 17:34'}, {'711訂單號碼': 'CM2106011285533', '數量': '1', '訂單索引': 248, '訂購人': '胡*潔', '訂購日期': '2021/06/01 1:30:16', '狀態': '訂單成立', '狀態更新時間': '06/01 1:30'}], '社團販售商品名': '✨哥德式生命果乳 GE 120Ml', '廠商': '哥德式', '科目': '哥德式果油乳', '項目': 'GE', '店東利潤': '53', '設計師利潤': '158', '定價': '1050', '沙龍定價': '525', '進價': '446', '貨源': 'Rough99'}, '✨萊雅絲芮雅活力啟動精粹90ml 萊雅絲芮雅活力啟動精粹90ml': {'合計數量': 1, '711訂單清單': [{'711訂單號碼': 'CM2105271085870', '數量': '1', '訂單索引': 159, '訂購人': '溫*妤', '訂購日期': '2021/05/27 14:34:40', '狀態': '訂單成立', '狀態更新時間': '05/27 14:34'}], '社團販售商品名': '✨萊雅絲芮雅活力啟動精粹90ml', '廠商': '萊雅', '科目': '萊雅頭皮', '項目': ' 絲芮雅活力啟動精粹', '店東利潤': '135', '設計師利潤': '370', '定價': '2700', '沙龍定價': '1250', '進價': '688', '貨源': 'Rough99'}, '✨Juliart甘草次酸角質淨化液 220ml ✨Juliart甘草次酸角質淨化液 220ml': {'合計數量': 6, '711訂單清單': [{'711訂單號碼': 'CM2105271085870', '數量': '1', '訂單索引': 160, '訂購人': '溫*妤', '訂購日期': '2021/05/27 14:34:40', '狀態': '訂單成立', '狀態更新時間': '05/27 14:34'}, {'711訂單號碼': 'CM2105271086966', '數量': '1', '訂單索引': 163, '訂購人': '陳*宇', '訂購日期': '2021/05/27 14:57:15', '狀態': '訂單成立', '狀態更新時間': '05/27 14:57'}, {'711訂單號碼': 'CM2105281135129', '數量': '1', '訂單索引': 190, '訂購人': '吳*蓁', '訂購日期': '2021/05/28 15:59:41', '狀態': '付款完成', '狀態更新時間': '05/29 10:54'}, {'711訂單號碼': 'CM2105311259850', '數量': '1', '訂單索引': 237, '訂購人': '蔡*儒', '訂購日期': '2021/05/31 16:27:06', '狀態': '訂單成立', '狀態更新時間': '05/31 16:27'}, {'711訂單號碼': 'CM2105311276451', '數量': '1', '訂單索引': 242, '訂購人': '謝*倫', '訂購日期': '2021/05/31 21:47:27', '狀態': '訂單成立', '狀態更新時間': '05/31 21:47'}, {'711訂單號碼': 'CM2106011285533', '數量': '1', '訂單索引': 249, '訂購人': '胡*潔', '訂購日期': '2021/06/01 1:30:16', '狀態': '訂單成立', '狀態更新時間': '06/01 1:30'}], '社團販售商品名': '✨Juliart甘草次酸角質淨化液 220ml', '廠商': '覺亞', '科目': '覺亞洗護', '項目': '甘草次酸角質淨化液 220ml', '店東利潤': '45', '設計師利潤': '135', '定價': '900', '沙龍定價': '450', '進價': '473', '貨源': 'Rough99'}, '✨Juliart希沛絲蘊髮洗髮精 220ml（油性） ✨Juliart希沛絲蘊髮洗髮精 220ml（油性': {'合計數量': 5, '711訂單清單': [{'711訂單號碼': 'CM2105271085870', '數量': '1', '訂單索引': 161, '訂購人': '溫*妤', '訂購日期': '2021/05/27 14:34:40', '狀態': '訂單成立', '狀態更新時間': '05/27 14:34'}, {'711訂單號碼': 'CM2105271086966', '數量': '1', '訂單索引': 164, '訂購人': '陳*宇', '訂購日期': '2021/05/27 14:57:15', '狀態': '訂單成立', '狀態更新時間': '05/27 14:57'}, {'711訂單號碼': 'CM2105281136686', '數量': '1', '訂單索引': 192, '訂購人': '柯*郎', '訂購日期': '2021/05/28 16:29:39', '狀態': '訂單成立', '狀態更新時間': '05/28 16:29'}, {'711訂單號碼': 'CM2105281144421', '數量': '1', '訂單索引': 194, '訂購人': '莫*霆', '訂購日期': '2021/05/28 19:21:22', '狀態': '訂單成立', '狀態更新時間': '05/28 19:21'}, {'711訂單號碼': 'CM2105281150150', '數量': '1', '訂單索引': 199, '訂購人': '文*柔', '訂購日期': '2021/05/28 21:16:44', '狀態': '訂單成立', '狀態更新時間': '05/28 21:16'}], '社團販售商品名': '✨Juliart希沛絲蘊髮洗髮精 220ml（油性）', '廠商': '覺亞', '科目': '覺亞洗護', '項目': '希沛絲蘊髮洗髮精 220ml 油性', '店東利潤': '45', '設計師利潤': '135', '定價': '900', '沙龍定價': '450', '進價': '473', '貨源': 'Rough99'}, '✨哥德式jemile fran護髮素500g 粗硬髮J 哥德式jemile fran護髮素500g 粗硬J': {'合計數量': 6, '711訂單清單': [{'711訂單號碼': 'CM2105271086966', '數量': '1', '訂單索引': 162, '訂購人': '陳*宇', '訂購日期': '2021/05/27 14:57:15', '狀態': '訂單成立', '狀態更新時間': '05/27 14:57'}, {'711訂單號碼': 'CM2105281131297', '數量': '1', '訂單索引': 186, '訂購人': '黃*軒', '訂購日期': '2021/05/28 14:39:20', '狀態': '訂單成立', '狀態更新時間': '05/28 14:39'}, {'711訂單號碼': 'CM2105281133396', '數量': '1', '訂單索引': 189, '訂購人': '馮*琁', '訂購日期': '2021/05/28 15:22:30', '狀態': '訂單成立', '狀態更新時間': '05/28 15:22'}, {'711訂單號碼': 'CM2105291178929', '數量': '1', '訂單索引': 208, '訂購人': '黃*淇', '訂購日期': '2021/05/29 16:50:19', '狀態': '已寄件', '狀態更新時間': '06/01 12:57'}, {'711訂單號碼': 'CM2105301220744', '數量': '1', '訂單索引': 219, '訂購人': '陳*穎', '訂購日期': '2021/05/30 17:34:54', '狀態': '訂單成立', '狀態更新時間': '05/30 17:34'}, {'711訂單號碼': 'CM2105311245200', '數量': '1', '訂單索引': 229, '訂購人': '何*佩', '訂購日期': '2021/05/31 10:54:27', '狀態': '訂單成立', '狀態更新時間': '05/31 10:54'}], '社團販售商品名': '✨哥德式jemile fran護髮素500g 粗硬髮J', '廠商': '哥德式', '科目': '哥德式jemilefran', '項目': '護髮素500g 粗硬髮J', '店東利潤': '70', '設計師利潤': '110', '定價': '1400', '沙龍定價': '800', '進價': '680', '貨源': 'Rough99'}, '✨Juliart養髮液 希沛絲蘊髮 115ml（油性） ✨Juliart養髮液希沛絲蘊髮 115ml（油性': {'合計數量': 4, '711訂單清單': [{'711訂單號碼': 'CM2105271086966', '數量': '1', '訂單索引': 165, '訂購人': '陳*宇', '訂購日期': '2021/05/27 14:57:15', '狀態': '訂單成立', '狀態更新時間': '05/27 14:57'}, {'711訂單號碼': 'CM2105271108744', '數量': '1', '訂單索引': 170, '訂購人': '莊*鈴', '訂購日期': '2021/05/27 22:01:19', '狀態': '訂單成立', '狀態更新時間': '05/27 22:01'}, {'711訂單號碼': 'CM2105281135129', '數量': '1', '訂單索引': 191, '訂購人': '吳*蓁', '訂購日期': '2021/05/28 15:59:41', '狀態': '付款完成', '狀態更新時間': '05/29 10:54'}, {'711訂單號碼': 'CM2105311259850', '數量': '1', '訂單索引': 238, '訂購人': '蔡*儒', '訂購日期': '2021/05/31 16:27:06', '狀態': '訂單成立', '狀態更新時間': '05/31 16:27'}], '社團販售商品名': '✨Juliart養髮液 希沛絲蘊髮 115ml（油性）', '廠商': '覺亞', '科目': '覺亞洗護', '項目': '養髮液 希沛絲蘊髮  115ml 油性', '店東利潤': '80', '設計師利潤': '240', '定價': '1600', '沙龍定價': '800', '進價': '840', '貨源': 'Rough99'}, '✨哥德式jemile fran熱光感洗髮精 M 500ml 哥德式熱光感洗髮精 M 500ml': {'合計數量': 4, '711訂單清單': [{'711訂單號碼': 'CM2105271089111', '數量': '1', '訂單索引': 166, '訂購人': '王*寧', '訂購日期': '2021/05/27 15:42:26', '狀態': '訂單成立', '狀態更新時間': '05/27 15:42'}, {'711訂單號碼': 'CM2105271100175', '數量': '2', '訂單索引': 168, '訂購人': '蔡*子', '訂購日期': '2021/05/27 19:20:27', '狀態': '訂單成立', '狀態更新時間': '05/27 19:20'}, {'711訂單號碼': 'CM2105281121548', '數量': '1', '訂單索引': 177, '訂購人': '黃*玲', '訂購日期': '2021/05/28 10:18:58', '狀態': '訂單成立', '狀態更新時間': '05/28 10:18'}], '社團販售商品名': '✨哥德式jemile fran熱光感洗髮精 M 500ml', '廠商': '哥德式', '科目': '哥德式jemilefran', '項目': '熱光感洗髮精 M 500ml', '店東利潤': '70', '設計師利潤': '140', '定價': '1400', '沙龍定價': '700', '進價': '595', '貨源': 'Rough99'}, '✨哥德式jemile fran護髮素500g 一般髮M 哥德式jemile fran護髮素500g一般髮M': {'合計數量': 2, '711訂單清單': [{'711訂單號碼': 'CM2105271093387', '數量': '2', '訂單索引': 167, '訂購人': '陳*菲', '訂購日期': '2021/05/27 17:09:19', '狀態': '訂單成立', '狀態更新時間': '05/27 17:09'}], '社團販售商品名': '✨哥德式jemile fran護髮素500g 一般髮M', '廠商': '哥德式', '科目': '哥德式jemilefran', '項目': '護髮素500g 一般髮M', '店東利潤': '70', '設計師利潤': '110', '定價': '1400', '沙龍定價': '800', '進價': '680', '貨源': 'Rough99'}, '✨Juliart極致控油胺基酸洗髮精 220ml ✨Juliart極致控油胺基酸洗髮精 220ml': {'合計數量': 4, '711訂單清單': [{'711訂單號碼': 'CM2105271112234', '數量': '1', '訂單索引': 171, '訂購人': '黃*茜', '訂購日期': '2021/05/27 23:09:31', '狀態': '訂單成立', '狀態更新時間': '05/27 23:09'}, {'711訂單號碼': 'CM2105281144941', '數量': '2', '訂單索引': 196, '訂購人': '張*雯', '訂購日期': '2021/05/28 19:32:42', '狀態': '訂單成立', '狀態更新時間': '05/28 19:32'}, {'711訂單號碼': 'CM2105281150150', '數量': '1', '訂單索引': 203, '訂購人': '文*柔', '訂購日期': '2021/05/28 21:16:44', '狀態': '訂單成立', '狀態更新時間': '05/28 21:16'}], '社團販售商品名': '✨Juliart極致控油胺基酸洗髮精 220ml', '廠商': '覺亞', '科目': '覺亞洗護', '項目': '極致控油胺基酸洗髮精 220ml', '店東利潤': '39', '設計師利潤': '117', '定價': '780', '沙龍定價': '390', '進價': '410', '貨源': 'Rough99'}, '✨Juliart養髮液 希沛絲蘊髮 115ml（乾性） ✨Juliart養髮液希沛絲蘊髮 115ml（乾性': {'合計數量': 4, '711訂單清單': [{'711訂單號碼': 'CM2105271114268', '數量': '2', '訂單索引': 173, '訂購人': '陳*宇', '訂購日期': '2021/05/27 23:57:59', '狀態': '訂單成立', '狀態更新時間': '05/27 23:57'}, {'711訂單號碼': 'CM2105311238116', '數量': '1', '訂單索引': 225, '訂購人': '韓*立', '訂購日期': '2021/05/31 1:06:32', '狀態': '訂單成立', '狀態更新時間': '05/31 1:06'}, {'711訂單號碼': 'CM2105311245200', '數量': '1', '訂單索引': 231, '訂購人': '何*佩', '訂購日期': '2021/05/31 10:54:27', '狀態': '訂單成立', '狀態更新時間': '05/31 10:54'}], '社團販售商品名': '✨Juliart養髮液 希沛絲蘊髮 115ml（乾性）', '廠商': '覺亞', '科目': '覺亞洗護', '項目': '養髮液 希沛絲蘊髮  115ml 乾性', '店東利潤': '80', '設計師利潤': '240', '定價': '1600', '沙龍定價': '800', '進價': '840', '貨源': 'Rough99'}, '✨萊雅絲漾博10合1發光噴霧 190ml 萊雅絲漾博10合1發光噴霧 190ml': {'合計數量': 3, '711訂單清單': [{'711訂單號碼': 'CM2105281115790', '數量': '1', '訂單索引': 174, '訂購人': '李*如', '訂購日期': '2021/05/28 0:49:32', '狀態': '訂單成立', '狀態更新時間': '05/28 0:49'}, {'711訂單號碼': 'CM2105301217177', '數量': '1', '訂單索引': 218, '訂購人': '周*燕', '訂購日期': '2021/05/30 16:09:29', '狀態': '訂單成立', '狀態更新時間': '05/30 16:09'}, {'711訂單號碼': 'CM2106011309110', '數量': '1', '訂單索引': 252, '訂購人': '黃*蓁', '訂購日期': '2021/06/01 17:38:35', '狀態': '訂單成立', '狀態更新時間': '06/01 17:38'}], '社團販售商品名': '✨萊雅絲漾博10合1發光噴霧 190ml', '廠商': '萊雅', '科目': '萊雅護髮', '項目': '絲漾博10合1發光噴霧 ', '店東利潤': '36', '設計師利潤': '72', '定價': '720', '沙龍定價': '360', '進價': '330', '貨源': 'Rough99'}, '✨哥德式MILBON 居家護理系列-絲柔洗髮精 200ml ✨哥德式居家護理系列絲柔洗髮精 200ml': {'合計數量': 2, '711訂單清單': [{'711訂單號碼': 'CM2105281121548', '數量': '1', '訂單索引': 175, '訂購人': '黃*玲', '訂購日期': '2021/05/28 10:18:58', '狀態': '訂單成立', '狀態更新時間': '05/28 10:18'}, {'711訂單號碼': 'CM2105311281357', '數量': '1', '訂單索引': 246, '訂購人': '陳*娥', '訂購日期': '2021/05/31 23:17:54', '狀態': '訂單成立', '狀態更新時間': '05/31 23:17'}], '社團販售商品名': '✨哥德式MILBON 居家護理系列-絲柔洗髮精 200ml', '廠商': '哥德式', '科目': '哥德式MILBON居家護理系列', '項目': '絲柔洗髮精 200ml', '店東利潤': '40', '設計師利潤': '80', '定價': '800', '沙龍定價': '400', '進價': '340', '貨源': 'Rough99'}, '✨哥德式MILBON 居家護理系列-絲柔洗髮精500ml ✨哥德式居家護理系列絲柔洗髮精 500ml': {'合計數量': 2, '711訂單清單': [{'711訂單號碼': 'CM2105281121548', '數量': '1', '訂單索引': 176, '訂購人': '黃*玲', '訂購日期': '2021/05/28 10:18:58', '狀態': '訂單成立', '狀態更新時間': '05/28 10:18'}, {'711訂單號碼': 'CM2105291189132', '數量': '1', '訂單索引': 212, '訂購人': '蘇*瑀', '訂購日期': '2021/05/29 20:27:02', '狀態': '訂單成立', '狀態更新時間': '05/29 20:27'}], '社團販售商品名': '✨哥德式MILBON 居家護理系列-絲柔洗髮精500ml', '廠商': '哥德式', '科目': '哥德式MILBON居家護理系列', '項目': '絲柔洗髮精 500ml', '店東利潤': '85', '設計師利潤': '170', '定價': '1700', '沙龍定價': '850', '進價': '893', '貨源': 'Rough99'}, '✨Juliart柔敏健髮胺基酸洗髮精 220ml ✨Juliart柔敏健髮胺基酸洗髮精 220ml': {'合計數量': 4, '711訂單清單': [{'711訂單號碼': 'CM2105281121548', '數量': '1', '訂單索引': 179, '訂購人': '黃*玲', '訂購日期': '2021/05/28 10:18:58', '狀態': '訂單成立', '狀態更新時間': '05/28 10:18'}, {'711訂單號碼': 'CM2105281150150', '數量': '1', '訂單索引': 201, '訂購人': '文*柔', '訂購日期': '2021/05/28 21:16:44', '狀態': '訂單成立', '狀態更新時間': '05/28 21:16'}, {'711訂單號碼': 'CM2105311238116', '數量': '1', '訂單索引': 224, '訂購人': '韓*立', '訂購日期': '2021/05/31 1:06:32', '狀態': '訂單成立', '狀態更新時間': '05/31 1:06'}, {'711訂單號碼': 'CM2105311276451', '數量': '1', '訂單索引': 243, '訂購人': '謝*倫', '訂購日期': '2021/05/31 21:47:27', '狀態': '訂單成立', '狀態更新時間': '05/31 21:47'}], '社團販售商品名': '✨Juliart柔敏健髮胺基酸洗髮精 220ml', '廠商': '覺亞', '科目': '覺亞洗護', '項目': '柔敏健髮胺基酸洗髮精 220ml', '店東利潤': '39', '設計師利潤': '117', '定價': '780', '沙龍定價': '390', '進價': '410', '貨源': 'Rough99'}, '✨哥德式Qufra 四重奏造型系列雪球藍 200g ✨哥德式Qufra 四重奏造型系列雪球藍 200g': {'合計數量': 1, '711訂單清單': [{'711訂單號碼': 'CM2105281131297', '數量': '1', '訂單索引': 187, '訂購人': '黃*軒', '訂購日期': '2021/05/28 14:39:20', '狀態': '訂單成立', '狀態更新時間': '05/28 14:39'}], '社團販售商品名': '✨哥德式Qufra 四重奏造型系列雪球藍 200g', '廠商': '哥德式', '科目': '哥德式造型', '項目': '雪球藍 200g', '店東利潤': '40', '設計師利潤': '80', '定價': '800', '沙龍定價': '400', '進價': '340', '貨源': 'Rough99'}, '✨哥德式藍鑽OIL護髮素M 500g ✨哥德式藍鑽OIL護髮素M 500g': {'合計數量': 2, '711訂單清單': [{'711訂單號碼': 'CM2105281133396', '數量': '1', '訂單索引': 188, '訂購人': '馮*琁', '訂購日期': '2021/05/28 15:22:30', '狀態': '訂單成立', '狀態更新時間': '05/28 15:22'}, {'711訂單號碼': 'CM2105311245200', '數量': '1', '訂單索引': 227, '訂購人': '何*佩', '訂購日期': '2021/05/31 10:54:27', '狀態': '訂單成立', '狀態更新時間': '05/31 10:54'}], '社團販售商品名': '✨哥德式藍鑽OIL護髮素M 500g', '廠商': '哥德式', '科目': '哥德式藍鑽OIL', '項目': '護髮素M 500g', '店東利潤': '95', '設計師利潤': '190', '定價': '1900', '沙龍定價': '950', '進價': '808', '貨源': 'Rough99'}, '✨Juliart深層抗屑胺基酸洗髮精 220ml ✨Juliart深層抗屑胺基酸洗髮精 220ml': {'合計數量': 2, '711訂單清單': [{'711訂單號碼': 'CM2105281140495', '數量': '1', '訂單索引': 193, '訂購人': '潘*伶', '訂購日期': '2021/05/28 17:48:55', '狀態': '訂單成立', '狀態更新時間': '05/28 17:48'}, {'711訂單號碼': 'CM2105281150150', '數量': '1', '訂單索引': 198, '訂購人': '文*柔', '訂購日期': '2021/05/28 21:16:44', '狀態': '訂單成立', '狀態更新時間': '05/28 21:16'}], '社團販售商品名': '✨Juliart深層抗屑胺基酸洗髮精 220ml', '廠商': '覺亞', '科目': '覺亞洗護', '項目': '深層抗屑胺基酸洗髮精 220ml', '店東利潤': '39', '設計師利潤': '117', '定價': '780', '沙龍定價': '390', '進價': '410', '貨源': 'Rough99'}, '✨Juliart健髮賦活胺基酸洗髮精 220ml ✨Juliart健髮賦活胺基酸洗髮精 220ml': {'合計數量': 4, '711訂單清單': [{'711訂單號碼': 'CM2105281144941', '數量': '3', '訂單索引': 195, '訂購人': '張*雯', '訂購日期': '2021/05/28 19:32:42', '狀態': '訂單成立', '狀態更新時間': '05/28 19:32'}, {'711訂單號碼': 'CM2105281150150', '數量': '1', '訂單索引': 202, '訂購人': '文*柔', '訂購日期': '2021/05/28 21:16:44', '狀態': '訂單成立', '狀態更新時間': '05/28 21:16'}], '社團販售商品名': '✨Juliart健髮賦活胺基酸洗髮精 220ml', '廠商': '覺亞', '科目': '覺亞洗護', '項目': '健髮賦活胺基酸洗髮精 220ml', '店東利潤': '39', '設計師利潤': '117', '定價': '780', '沙龍定價': '390', '進價': '410', '貨源': 'Rough99'}, '✨Juliart希沛絲蘊髮洗髮精 220ml（乾性） ✨Juliart希沛絲蘊髮洗髮精 220ml（乾性': {'合計數量': 1, '711訂單清單': [{'711訂單號碼': 'CM2105281150150', '數量': '1', '訂單索引': 200, '訂購人': '文*柔', '訂購日期': '2021/05/28 21:16:44', '狀態': '訂單成立', '狀態更新時間': '05/28 21:16'}], '社團販售商品名': '✨Juliart希沛絲蘊髮洗髮精 220ml（乾性）', '廠商': '覺亞', '科目': '覺亞洗護', '項目': '希沛絲蘊髮洗髮精 220ml 乾性', '店東利潤': '45', '設計師利潤': '135', '定價': '900', '沙龍定價': '450', '進價': '473', '貨源': 'Rough99'}, '✨哥德式MILBON 居家護理系列-潤活洗髮精 500ml 德式居家護理系列潤活洗髮精  500ml': {'合計數量': 1, '711訂單清單': [{'711訂單號碼': 'CM2105291168625', '數量': '1', '訂單索引': 206, '訂購人': '吳*蓉', '訂購日期': '2021/05/29 12:58:37', '狀態': '訂單成立', '狀態更新時間': '05/29 12:58'}], '社團販售商品名': '✨哥德式MILBON 居家護理系列-潤活洗髮精 500ml', '廠商': '哥德式', '科目': '哥德式MILBON居家護理系列', '項目': '潤活洗髮精 500ml', '店東利潤': '85', '設計師利潤': '170', '定價': '1700', '沙龍定價': '850', '進價': '893', '貨源': 'Rough99'}, '✨哥德式jemile fran熱光感洗髮精 J 500ml 哥德式熱光感洗髮精 J 500ml': {'合計數量': 3, '711訂單清單': [{'711訂單號碼': 'CM2105291178929', '數量': '1', '訂單索引': 209, '訂購人': '黃*淇', '訂購日期': '2021/05/29 16:50:19', '狀態': '已寄件', '狀態更新時間': '06/01 12:57'}, {'711訂單號碼': 'CM2105291194192', '數量': '1', '訂單索引': 214, '訂購人': '游*靜', '訂購日期': '2021/05/29 22:12:17', '狀態': '訂單成立', '狀態更新時間': '05/29 22:12'}, {'711訂單號碼': 'CM2105311243705', '數量': '1', '訂單索引': 226, '訂購人': '洪*涵', '訂購日期': '2021/05/31 10:00:51', '狀態': '訂單成立', '狀態更新時間': '05/31 10:00'}], '社團販售商品名': '✨哥德式jemile fran熱光感洗髮精 J 500ml', '廠商': '哥德式', '科目': '哥德式jemilefran', '項目': '熱光感洗髮精 J 500ml', '店東利潤': '70', '設計師利潤': '140', '定價': '1400', '沙龍定價': '700', '進價': '595', '貨源': 'Rough99'}, '✨萊雅絲漾博護色洗髮精300ml 萊雅絲漾博護色洗髮精300ml': {'合計數量': 2, '711訂單清單': [{'711訂單號碼': 'CM2105291190468', '數量': '2', '訂單索引': 213, '訂購人': '顏*', '訂購日期': '2021/05/29 20:54:21', '狀態': '已寄件', '狀態更新時間': '06/01 12:57'}], '社團販售商品名': '✨萊雅絲漾博護色洗髮精300ml', '廠商': '萊雅', '科目': '萊雅洗髮', '項目': '絲漾博護色洗髮精 300ml', '店東利潤': '30', '設計師利潤': '40', '定價': '600', '沙龍定價': '350', '進價': '193', '貨源': 'Rough99'}, '✨哥德式藍鑽OIL護髮素F 500g 哥德式藍鑽OIL護髮素F 500g': {'合計數量': 1, '711訂單清單': [{'711訂單號碼': 'CM2105311238116', '數量': '1', '訂單索引': 222, '訂購人': '韓*立', '訂購日期': '2021/05/31 1:06:32', '狀態': '訂單成立', '狀態更新時間': '05/31 1:06'}], '社團販售商品名': '✨哥德式藍鑽OIL護髮素F 500g', '廠商': '哥德式', '科目': '哥德式藍鑽OIL', '項目': '護髮素F 500g', '店東利潤': '95', '設計師利潤': '190', '定價': '1900', '沙龍定價': '950', '進價': '808', '貨源': 'Rough99'}, '✨哥德式藍鑽OIL洗髮精M 500ml ✨哥德式藍鑽OIL洗髮精M 500ml': {'合計數量': 1, '711訂單清單': [{'711訂單號碼': 'CM2105311245200', '數量': '1', '訂單索引': 228, '訂購人': '何*佩', '訂購日期': '2021/05/31 10:54:27', '狀態': '訂單成立', '狀態更新時間': '05/31 10:54'}], '社團販售商品名': '✨哥德式藍鑽OIL洗髮精M 500ml', '廠商': '哥德式', '科目': '哥德式藍鑽OIL', '項目': '洗髮精M 500ml', '店東利潤': '85', '設計師利潤': '170', '定價': '1700', '沙龍定價': '850', '進價': '723', '貨源': 'Rough99'}};
+        var order_list = Object.values(order_items).map((x) => ({...x, ...{'711訂單清單': x['711訂單清單'].map((y) => ({...y, ...{'checked':true}}))}}));
+        var columns = [
+            ...['社團販售商品名', '廠商', '項目'].map((x) => ({
+                field: x,
+                title: x,
+                //class: "col-3",
+                sortable : true,
+                valign: 'middle',
+            })),
+            {
+                field: '定價',
+                title: '定價',
+                sortable : true,
+                formatter: function(value, item, index) { return  '$' + (item['定價'] * 1).toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")},
+                valign: 'middle',
+                footerFormatter: '總金額：',
+            },
+            {
+                field: '進價',
+                title: '進價',
+                sortable : true,
+                formatter: function(value, item, index) { return  '$' + (item['進價'] * 1).toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")},
+                valign: 'middle',
+                footerFormatter: function() { return '$' + $('#table').bootstrapTable('getData').map(y => (y['進價']*get_item_quantity(y['711訂單清單']))).reduce((a,b)=>a+b).toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")},
+
+            },
+            {
+                field: '合計數量',
+                title: '合計數量',
+                sortable : true,
+                valign: 'middle',
+                formatter: function(value, item, index) { return get_item_quantity(item['711訂單清單'])},
+                footerFormatter: function () {
+                    var result = '<button id="map" class="btn btn-info" data-toggle="modal" onclick="submit_order()">新增</button>';
+                    return result;
+                }
+            },
+            {   
+                title: '合計金額',
+                // class: "col-2",
+                // sortable : true,
+                valign: 'middle',
+                // onMsoNumberFormat: '0.00',
+                formatter: function(value, item, index) { return  '$' + (item['進價']*get_item_quantity(item['711訂單清單'])).toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")},
+                // sorter: function(value, item) { return  (item['總金額']/(item['指定客次']+item['不指定客次'])).toFixed(2) | 0},
+                footerFormatter: function () {
+                    var result = '<button id="map" class="btn btn-info" data-toggle="modal" onclick="cancel()">取消</button>';
+                    return result;
+                }
+            }
+            // {
+            //     // field: '上下班',
+            //     title: '定位',
+            //     //class: "col-2",
+            //     valign: 'middle',
+            //     //formatter: function(value, item, index) { return "https://maps.google.com/?q="+item['緯度']+","+item['經度']},
+            //     formatter: function (value, item, index) {
+            //         var result = "";
+            //         result += '<button id="map" class="btn btn-info" data-toggle="modal" onclick="window.open(\'https://maps.google.com/?q='+item['緯度']+','+item['經度']+'\')">Map</button>';
+            //         return result;
+            //     }
+            // }
+        ];  
+
+        function new_order() {
+            vue.$refs.makeorder.is_creating=true;
+            $('#table').bootstrapTable({
+                data: order_list,
+                classes: 'table',
+                columns: columns,
+                showFooter: true,
+                showMultiSort: true,
+                showMultiSortButton: false,
+                detailView:true,
+                onExpandRow: function (index, row, $detail) {
+                compExtInfo($detail, row, index);},
+                // detailFormatter:"detailFormatter",
+                // onExpandRow:function(index, row, $detail)
+                // { 
+                //     alert(JSON.stringify(row));
+                // },
+                sortPriority:[
+                    {"sortName": "社團販售商品名", "sortOrder": "desc"},
+                ],
+            })
+        }
+        
+        function get_item_quantity(oders) {
+            var cnt = 0
+            $.each(oders, function (idx, value) {
+                if (value['checked'] === true) (
+                    cnt += parseInt(value['數量'])
+                );
+            });
+            return cnt;
+        }
+
+        function compExtInfo($detail, row, index) {
+            $detail.html('<table></table>').find('table').bootstrapTable({
+                showMultiSortButton: false,
+                classes: 'table table-sm table-info',
+                data: row['711訂單清單'],
+                clickToSelect:true,
+                cache:false,
+                onCheck: function (sub_row, $element) {
+                    var ori_amount = parseInt(row['合計數量'])*parseInt(row['進價']);
+                    row['711訂單清單'][$element.data('index')]['checked'] = true;
+                    row['合計數量'] += parseInt(row['711訂單清單'][$element.data('index')]['數量']);
+                    // order_list = $('#table').bootstrapTable('getData');
+                    var new_amount = (parseInt(row['合計數量'])*parseInt(row['進價']));
+                    $detail.prevObject.prevObject.find( "td" ).eq(6).html(row['合計數量']);
+                    $detail.prevObject.prevObject.find( "td" ).eq(7).html('$' + new_amount.toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+                    var total_amount = Number($("#table > tfoot > tr > th:nth-child(7)").text().replace(/[^0-9.-]+/g,"")) - (ori_amount - new_amount);
+                    $("#table > tfoot > tr > th:nth-child(7)").text(total_amount.toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+                },
+                onUncheck: function (sub_row, $element) {
+                    var ori_amount = parseInt(row['合計數量'])*parseInt(row['進價']);
+                    row['711訂單清單'][$element.data('index')]['checked'] = false;
+                    row['合計數量'] -= parseInt(row['711訂單清單'][$element.data('index')]['數量']);
+                    // order_list = $('#table').bootstrapTable('getData');
+                    var new_amount = (parseInt(row['合計數量'])*parseInt(row['進價']));
+                    $detail.prevObject.prevObject.find( "td" ).eq(6).html(row['合計數量']);
+                    $detail.prevObject.prevObject.find( "td" ).eq(7).html('$' + new_amount.toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+                    var total_amount = Number($("#table > tfoot > tr > th:nth-child(7)").text().replace(/[^0-9.-]+/g,"")) - (ori_amount - new_amount);
+                    $("#table > tfoot > tr > th:nth-child(7)").text(total_amount.toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+                },
+                onCheckAll: function (rowsAfter, rowsBefore) {
+                    var ori_amount = parseInt(row['合計數量'])*parseInt(row['進價']);
+                    var cnt = 0;
+                    $.each(rowsAfter, function (idx, value) {
+                        row['711訂單清單'][idx]['checked'] = true;
+                        cnt += parseInt(row['711訂單清單'][idx]['數量']);
+                    });
+                    row['合計數量'] = cnt;
+                    var new_amount = parseInt(row['合計數量'])*parseInt(row['進價']);
+                    $detail.prevObject.prevObject.find( "td" ).eq(6).html(row['合計數量']);
+                    $detail.prevObject.prevObject.find( "td" ).eq(7).html('$' + new_amount.toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+                    var total_amount = Number($("#table > tfoot > tr > th:nth-child(7)").text().replace(/[^0-9.-]+/g,"")) - (ori_amount - new_amount);
+                    $("#table > tfoot > tr > th:nth-child(7)").text(total_amount.toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+                },
+                onUncheckAll: function (rowsAfter, rowsBefore) {
+                    var ori_amount = parseInt(row['合計數量'])*parseInt(row['進價']);
+                    $.each(rowsBefore, function (idx, value) {
+                        row['711訂單清單'][idx]['checked'] = false;
+                    });
+                    row['合計數量'] = 0;
+                    var new_amount = 0;
+                    
+                    $detail.prevObject.prevObject.find( "td" ).eq(6).html(row['合計數量']);
+                    $detail.prevObject.prevObject.find( "td" ).eq(7).html('$' + new_amount.toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+                    var total_amount = Number($("#table > tfoot > tr > th:nth-child(7)").text().replace(/[^0-9.-]+/g,"")) - (ori_amount - new_amount);
+                    $("#table > tfoot > tr > th:nth-child(7)").text(total_amount.toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+                    // order_list = $('#table').bootstrapTable('getData');
+                    // $('#table').bootstrapTable('updateCell', {index:index , field: '711訂單清單', value: row['711訂單清單']});
+                },
+                columns: [
+                    {
+                        field: 'checked',
+                        checkbox: true,
+                        // checkboxEnabled: true
+                        // formatter : stateFormatter
+                    },
+                    {
+                        field: '訂購日期',
+                        title: '訂購日期'
+                    },
+                    {
+                        field: '訂購人',
+                        title: '訂購人'
+                    },
+                    {
+                        field: '711訂單號碼',
+                        title: '訂單號碼'
+                    },
+                    {
+                        field: '數量',
+                        title: '數量'
+                    }
+                ]
+            });
+        }
+
+        function stateFormatter(value, row, index) {
+            // $('#table').bootstrapTable('updateCell', {index: 1, field: 'name', value: 'Updated Name'}).
+            if (row.checked == true) {
+                return {
+                    disabled : false,//設定是否可用
+                    checked : true//設定選中
+                };
+            } else {
+                return {
+                    disabled : false,//設定是否可用
+                    checked : false//設定選中
+                };
+            }
+        }
+
+        function detailFormatter(index, row) {
+            var html = []
+            $.each(row["711訂單清單"], function (idx, value) {
+                html.push('<p><b>' + value["711訂單號碼"] + ':</b> ' + value["數量"] + '</p>')
+            });
+            return html.join('')
+        }
+
+        function submit_order() {
+            $("#john_loading").css("visibility", "visible");
+            var post_body = {"data": $('#table').bootstrapTable('getData')};
+            return new Promise(function (resolve, reject) {
+            var timestamp = new Date();
+            var xhr = new XMLHttpRequest();
+            //xhr.setRequestHeader('Authorization', 'Bearer '+  token);
+            //xhr.withCredentials = true;
+            setCookie("id_token", user_session.getAuthResponse().id_token, 10);
+            xhr.open("POST", "seven-11-shipping?target=make_order&_="+timestamp.getTime().toString(), true);
+            //xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = async function() {
+                    $("#john_loading").css("visibility", "hidden");
+                    if(xhr.readyState == 4 && xhr.status == 200) {
+                        var msg = xhr.responseText;
+                        if (msg === 'OK') {
+                            var new_order_list = Array.from($('#table').bootstrapTable('getData'));
+                            $('#table').bootstrapTable('destroy');
+                            $('#table').bootstrapTable({
+                                data: new_order_list,
+                                classes: 'table',
+                                columns: [...columns.slice(0, columns.length-2), {   
+                                    field: '合計數量',
+                                    title: '合計數量',
+                                    sortable : true,
+                                    valign: 'middle',
+                                    formatter: function(value, item, index) { return get_item_quantity(item['711訂單清單'])},
+                                }, {   
+                                    title: '合計金額',
+                                    valign: 'middle',
+                                    formatter: function(value, item, index) { return  '$' + (item['進價']*get_item_quantity(item['711訂單清單'])).toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}
+                                }],
+                                showFooter: true,
+                                showMultiSort: true,
+                                showMultiSortButton: false,
+                                sortPriority:[
+                                    {"sortName": "社團販售商品名", "sortOrder": "desc"},
+                                ],
+                            });
+                            Swal.fire({
+                                title: '系統訊息',
+                                text: '訂單新增成功',
+                                icon: "success",
+                            }).then(function(){
+                                // TODO
+                                resolve(true);
+                            });
+                        } else {
+                            Swal.fire({
+                            title: '系統訊息',
+                            text: '訂單新增失敗，請重新操作',
+                            icon: "warning",
+                            }).then(function(){
+                                reject(false);
+                            });
+                        }
+                        
+                        //console.log("BODY", body);
+                        
+                    } else if (xhr.status == 500) {
+                        Swal.fire({
+                            title: '系統訊息',
+                            text: '訂單新增失敗，請重新操作',
+                            icon: "warning",
+                        }).then(function(){
+                            reject(false);
+                        });
+                    }
+            }
+            xhr.send(JSON.stringify(post_body));
+            })
+        }
+
+        function cancel() {
+            $('#table').bootstrapTable('destroy');
+            vue.$refs.makeorder.is_creating=false
+        }
+        
+        Vue.config.debug = false;
+        var vue = new Vue({el: "#vue", data: data});
+	</script>
+    </body>
 </html>
