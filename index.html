@@ -43,8 +43,13 @@
       cipher = crypt.encrypt(input_text);
       var l_share = crypt.decrypt("U2FsdGVkX19bZdUyP6Nn11iNElZNRfqr9dualpOypUoY0VC1oUKSEg4fcjNfbJnx");
       console.log(cipher);
-      // https://line.me/R/share?text=
       window.location.href = l_share + encodeURIComponent(url.href + "?cipher="+encodeURIComponent(cipher));
+    }
+
+    function copy_content() {
+      document.getElementById("shared_content").focus();
+      document.getElementById("shared_content").select();
+      document.execCommand("copy");
     }
 
     </script>
@@ -60,9 +65,10 @@
       <input type="button" value="分享" onclick="encrypt_input()">
     </div>
     <div id="shared" style="text-align: center;display: none;">
+      <H1>點擊分享內容可直接複製</H1>
       <textarea id="shared_content"
         cols="auto"
-        required
+        onclick="copy_content()"
         style="font-size:20px;color:green;width:100%;" 
       ></textarea>
     <div>
