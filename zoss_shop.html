@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <title>ZOSS Color 資訊系統</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js'></script>
+	  <script src="https://cdn.jsdelivr.net/npm/vue2-filters/dist/vue2-filters.min.js"></script>
+	  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+	  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.min.js"></script>
+    <script>
+    var crypt = {
+      secret : "WHOCARE",
+      
+      encrypt : function (clear) {
+        var cipher = CryptoJS.AES.encrypt(clear, crypt.secret);
+        cipher = cipher.toString();
+        return cipher;
+      },
+
+      decrypt : function (cipher) {
+        var decipher = CryptoJS.AES.decrypt(cipher, crypt.secret);
+        decipher = decipher.toString(CryptoJS.enc.Utf8);
+        return decipher;
+      }
+    };
+
+    function translationStr(str) {
+        if (parseInt(str)) {
+            return parseInt(str)
+        } else if (['', '\r'].includes(str)) {
+            return null
+        } else {
+            return str
+        }
+    };
+    
+    function csvJSON(csv) {
+        var lines=csv.split("\n");
+        var result = [];
+        var headers=lines[0].split("	");
+        for(var i=1;i<lines.length;i++){
+            var obj = {};
+            var currentline=lines[i].split("	");
+            for(var j=0;j<headers.length;j++){
+                obj[headers[j].trim()] = translationStr(currentline[j].trim());
+            }
+            result.push(obj);
+        }
+        return JSON.stringify(result);
+    };
+
+    var url = new URL(location.href);
+    var cipher = url.searchParams.get("cipher");
+
+    function encrypt_input() {
+      var input_text = document.getElementById("share_content").value;
+      cipher = crypt.encrypt(input_text);
+      window.location.href = url.href + "?cipher=" + encodeURIComponent(cipher);
+      // var l_share = crypt.decrypt("U2FsdGVkX19bZdUyP6Nn11iNElZNRfqr9dualpOypUoY0VC1oUKSEg4fcjNfbJnx");
+      // console.log(cipher);
+      // window.location.href = l_share + encodeURIComponent(url.href + "?cipher="+encodeURIComponent(cipher));
+    }
+
+    function copy_content() {
+      document.getElementById("shared_content").focus();
+      document.getElementById("shared_content").select();
+      document.execCommand("copy");
+    }
+
+    Vue.component('suite-list', {
+            template:
+            '<div class="container">' +
+            '<div class="row g-3 align-items-center">' +
+            '<select v-model="shop" class="col-auto btn dropdown-toggle m-1 text-info" @change="designer=\'\'">' +
+            '<option value="" disabled>選擇分店</option>' +
+            '<option v-for="(target, name, index) in designer_price" :value="name">{{ name }}</option>' +
+            '</select>' +
+            '<select :disabled="shop && shop===\'\'" v-model="designer" class="col-auto btn dropdown-toggle m-1 text-info">&nbsp;&nbsp;' +
+            '<option value="" disabled>選擇設計師</option>' +
+            '<option v-for="(target, name, index) in designer_price[shop]" :value="name">{{ name }}</option>' +
+            '</select>' +
+            '<span v-if="designer" class="col-auto text-info">的ZOSS SHOP專屬連結為</span><br>' +
+            '<a :href="get_price(shop, designer)">{{ get_price(shop, designer) }}</a>'+
+            '</div></div>',
+            props: ["designer_price", "shop", "designer"],
+            data: function() {
+                return {
+                    shop: "",
+                    designer: "",
+                }
+            },
+            filters: {
+                no_data: function(str) {
+                    return str?str:"-" ;
+                }
+            },
+            methods: {
+                get_price: function(shop, designer) {
+                    var result;
+                    if (shop && shop !== "" && designer!=="") {
+                        var d = this.designer_price[shop][designer];
+                        result = d["專屬連結"];
+                        return result
+                    }
+                    return ""
+                },
+                selectAll: function (option) {
+                    if (option === 'all') {
+                        var selected = Array.prototype.concat(...Object.values(this.cols));
+                    } else {
+                        var selected = [...this.cols[option]];
+                    }
+                    if (this.chk_selectAll(option)) {
+                        this.selected_cols = [...this.selected_cols.filter(col => !selected.includes(col))];
+                    } else {
+                        this.selected_cols = [...this.selected_cols.filter(col => !selected.includes(col)) ,...selected];
+                    }
+                },
+                chk_selectAll: function (option) {
+                    if (option === 'all') {
+                        var selected = Array.prototype.concat(...Object.values(this.cols));
+                    } else {
+                        var selected = [...this.cols[option]];
+                    }
+                    return selected.filter(col => !this.selected_cols.includes(col)).length === 0 ? true : false
+                }
+            },
+            mounted () {
+                this.shop= "";
+                this.designer= "";
+            },
+        });
+
+        Vue.config.debug = false;
+        var vue;
+        var data;
+        var designer_price={};
+
+
+        window.onload = function(e) {
+          if (cipher) {
+            var decipher = crypt.decrypt(cipher);
+            console.log(decipher);
+            if (decipher.substring(0,4) === "http") {
+              window.location.href = decipher;
+            } else {
+              $(JSON.parse(csvJSON(decipher))).each(function (k, v) {
+                  if (!designer_price[v['分店']]) {
+                      designer_price[v['分店']] = {};
+                  }
+                  designer_price[v['分店']][v['設計師名稱']] = {專屬連結: v['專屬連結']};
+              });
+              data = {
+                designer_price: designer_price,
+              };
+              vue = new Vue({el: "#vue", data: data});
+            }
+          } else {
+            document.getElementById("to_share").style.display = "block";
+          }
+        };
+
+    </script>
+  </head>
+  <body style="margin: 0 auto;max-width: 85%;">
+    <div id="to_share" style="text-align: center;display: none;">
+      <H1>請輸入要分享內容</H1>
+      <textarea id="share_content"
+        rows="20"
+        required
+        style="font-size:20px;width:100%;"
+      ></textarea>
+      <input type="button" value="分享" onclick="encrypt_input()">
+    </div>
+    <div id="vue">
+		  <suite-list :designer_price="designer_price"></suite-list>
+	  </div>
+
+  </body>
+</html>
