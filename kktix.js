@@ -113,14 +113,14 @@ Mac
 1. 登入 https://kktix.com/users/sign_in
 2. command + option + I
 3. 點選『console』
-4. 貼上並執行『$.getScript('https://zoss-clock-in.web.app/js/711_download.js')』
-5. 貼上並執行take_seat("stomp2022-02", "台北", [2400,2000])
+4. 貼上並執行 $.getScript('https://o926428377.github.io/share_enc_text/kktix.js')
+5. 貼上並執行 take_seat("stomp2022-02", "台北", [2400,2000])
 
 Windows
 1. 登入 https://kktix.com/users/sign_in
 2. F12
 3. 點選『console』
-4. 貼上並執行『$.getScript('https://zoss-clock-in.web.app/js/711_download.js')』
+4. 貼上並執行 $.getScript('https://o926428377.github.io/share_enc_text/kktix.js')
 5. 貼上並執行 take_seat("stomp2022-02", "台北", [2400,2000])
 */
 
