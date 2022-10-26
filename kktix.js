@@ -76,18 +76,18 @@ function GET_token(uri){
     })
 }
 
-function take_seat(event_name, custom_captcha, expect_price) {
+function take_seat(event_name, custom_captcha, expect_price, quantity) {
     var base_info_url = `https://kktix.com/g/events/${event_name}/base_info`;
     var authenticity_token, url;
     var re = /<meta name="csrf-token" content="([^"]*)" \/>/i;
     var data = {"tickets":[{"id":431420,"quantity":2,"invitationCodes":[],"member_code":"","use_qualification_id":null}],"currency":"TWD","recaptcha":{},"custom_captcha":custom_captcha,"agreeTerm":true};
+    data.tickets[0].quantity = quantity;
     GET(base_info_url).then(function (eventData) {
         var tickets = eventData.eventData.tickets;
         // tickets = [tickets[0]];
         for (var _i in tickets) {
             if (expect_price.includes(tickets[_i].price.cents/100)) {
                 data.tickets[0].id = tickets[_i].id;
-                data.tickets[0].quantity = 2;
                 // authenticity_token = $("meta[name=csrf-token]").attr("content");
                 GET_token("https://kktix.com/events/stomp2022-02/registrations/new").then(function (html) { 
                     authenticity_token = html.match(re)[1];
@@ -114,14 +114,14 @@ Mac
 2. command + option + I
 3. 點選『console』
 4. 貼上並執行 $.getScript('https://o926428377.github.io/share_enc_text/kktix.js')
-5. 貼上並執行 take_seat("stomp2022-02", "台北", [2400,2000])
+5. 貼上並執行 take_seat("stomp2022-02", "台北", [2400,2000], 2)
 
 Windows
 1. 登入 https://kktix.com/users/sign_in
 2. F12
 3. 點選『console』
 4. 貼上並執行 $.getScript('https://o926428377.github.io/share_enc_text/kktix.js')
-5. 貼上並執行 take_seat("stomp2022-02", "台北", [2400,2000])
+5. 貼上並執行 take_seat("stomp2022-02", "台北", [2400,2000], 2)
 */
 
 // take_seat("stomp2022-02", "台北", [2400,2000]);
