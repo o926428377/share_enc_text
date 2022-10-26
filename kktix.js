@@ -9,7 +9,7 @@ function POST(uri, post_body, i=1){
         xhr.onreadystatechange = async function() {
             if(xhr.readyState == 4 && xhr.status == 200) {
                 var body = JSON.parse(xhr.responseText);
-                if (body.result === "not_found") {
+                if (body.result === "Enqueue too soon!") {
                     setTimeout(function(){
                         POST(uri, post_body, i+1).then(function (result) {
                             resolve(result);
