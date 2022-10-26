@@ -87,12 +87,12 @@ function take_seat(event_name, custom_captcha, expect_price, quantity) {
         for (var _i in tickets) {
             if (expect_price.includes(tickets[_i].price.cents/100)) {
                 // authenticity_token = $("meta[name=csrf-token]").attr("content");
-                GET_token("https://kktix.com/events/stomp2022-02/registrations/new", _i).then(function (result) { 
-                    data.tickets[0].id = tickets[result.idx].id;
-                    POST(`https://queue.kktix.com/queue/${event_name}?authenticity_token=${encodeURIComponent(result.authenticity_token)}`, data).then(function (token) {
+                GET_token("https://kktix.com/events/stomp2022-02/registrations/new", _i).then(function (token) { 
+                    data.tickets[0].id = tickets[token.idx].id;
+                    POST(`https://queue.kktix.com/queue/${event_name}?authenticity_token=${encodeURIComponent(token.authenticity_token)}`, data).then(function (token) {
                         GET(`https://queue.kktix.com/queue/token/${token.token}`).then(function (result) {
                             if (!result.message) {
-                                console.log(`[${tickets[_i].id}] ${tickets[_i].name}金額：${tickets[_i].price.cents/100}`);
+                                console.log(`[${tickets[token.idx].id}] ${tickets[token.idx].name}金額：${tickets[token.idx].price.cents/100}`);
                                 console.log(`開始劃位: https://kktix.com/events/${event_name}/registrations/${result.to_param}#/booking`);
                                 window.open(`https://kktix.com/events/${event_name}/registrations/${result.to_param}#/booking`);
                             }
