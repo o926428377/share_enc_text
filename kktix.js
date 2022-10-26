@@ -58,7 +58,7 @@ function GET(uri){
     })
 }
 
-function GET_token(uri){
+function GET_token(uri, idx){
     return new Promise(function (resolve, reject) {
         var re = /<meta name="csrf-token" content="([^"]*)" \/>/i;
         var xhr = new XMLHttpRequest();
@@ -69,7 +69,7 @@ function GET_token(uri){
         xhr.onreadystatechange = async function() {
             if(xhr.readyState == 4 && xhr.status == 200) {
                 var token = xhr.responseText.match(re)[1];
-                resolve(token);
+                resolve({authenticity_token:token, idx:idx});
             } else if (xhr.status == 500) {
                 reject(false);
             }
@@ -86,10 +86,10 @@ function take_seat(event_name, custom_captcha, expect_price, quantity) {
         var tickets = eventData.eventData.tickets;
         for (var _i in tickets) {
             if (expect_price.includes(tickets[_i].price.cents/100)) {
-                data.tickets[0].id = tickets[_i].id;
                 // authenticity_token = $("meta[name=csrf-token]").attr("content");
-                GET_token("https://kktix.com/events/stomp2022-02/registrations/new").then(function (authenticity_token) { 
-                    POST(`https://queue.kktix.com/queue/${event_name}?authenticity_token=${encodeURIComponent(authenticity_token)}`, data).then(function (token) {
+                GET_token("https://kktix.com/events/stomp2022-02/registrations/new", _i).then(function (result) { 
+                    data.tickets[0].id = tickets[result.idx].id;
+                    POST(`https://queue.kktix.com/queue/${event_name}?authenticity_token=${encodeURIComponent(result.authenticity_token)}`, data).then(function (token) {
                         GET(`https://queue.kktix.com/queue/token/${token.token}`).then(function (result) {
                             if (!result.message) {
                                 console.log(`[${tickets[_i].id}] ${tickets[_i].name}金額：${tickets[_i].price.cents/100}`);
