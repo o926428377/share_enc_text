@@ -79,7 +79,6 @@ function GET_token(uri, idx){
 }
 
 function ticket_grabbing_master(event_name, custom_captcha, expect_price, quantity) {
-    window.open(`https://kktix.com/events/${event_name}/registrations/new`, "_self");
     var base_info_url = `https://kktix.com/g/events/${event_name}/base_info`;
     var data = {"tickets":[{"id":431420,"quantity":2,"invitationCodes":[],"member_code":"","use_qualification_id":null}],"currency":"TWD","recaptcha":{},"custom_captcha":custom_captcha,"agreeTerm":true};
     data.tickets[0].quantity = quantity;
