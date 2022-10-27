@@ -111,7 +111,7 @@ function ticket_grabbing(event_name, custom_captcha, expect_price, quantity) {
     script.src = 'https://o926428377.github.io/share_enc_text/kktix.js';
     xx.document.head.appendChild(script);
     var exec = document.createElement('script');
-    exec.append(`window.onload=function(){ticket_grabbing_master("${event_name}", "${custom_captcha}", ${expect_price},${quantity});}`)
+    exec.append(`window.onload=function(){ticket_grabbing_master("${event_name}", "${custom_captcha}", [${expect_price}],${quantity});}`)
     xx.document.head.appendChild(exec);
 }
 
